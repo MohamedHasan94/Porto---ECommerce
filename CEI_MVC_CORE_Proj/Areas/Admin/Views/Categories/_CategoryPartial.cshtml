@@ -1,0 +1,51 @@
+﻿@model PaginatedList<Category>
+
+    <div id="categoriesTable">
+        @if(Model.Count > 0)
+        { 
+        <table table class="table table-hover table-striped table-bordered">
+            <thead>
+                <tr>
+                    @*<th>Id</th>*@
+                    <th>Name</th>
+                    <th>No. of Products</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                @foreach (Category item in Model)
+                {
+                    <partial name="_CategoryRowPartial" model="item" />
+                }
+            </tbody>
+        </table>
+        <nav aria-label="..." id="productPage">
+            <ul class="pagination" style="cursor:pointer">
+
+                <li onclick="Previouspage()">
+                    <a aria-label="Next">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="active" onclick="Page(1)" id="1page"><a>1</a></li>
+                @for (int i = 2; i <= Model.TotalPages; i++)
+                {
+                    string id = $"{i}page";
+                    <li class="" onclick="Page(@i)" id="@id"><a>@i</a></li>
+                }
+                <li onclick="Nextpage()">
+                    <a aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        }
+        else
+        {
+        <div class="alert alert-info">
+            No Categories found.
+        </div>
+        }
+    </div>

@@ -1,0 +1,141 @@
+﻿@model UsersViewModel
+
+
+    <div id="contentWrapper">
+
+        @* Add This Section For Filtering *@
+
+        <form asp-action="AjaxPage" onsubmit="FilterPage(this)" method="get">
+            <div class="form-actions no-color">
+                <p>
+                    Find by name: <input required type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+                    <input type="submit" value="Search" class="btn btn-default" /> |
+                    <a asp-action="Index" class="btn btn-primary">Back to Full List</a>
+                </p>
+            </div>
+        </form>
+        @* ----------------- *@
+
+        <div id="msg" class="alert alert-info" style="display:none;"></div>
+        @if (@Model.Users.Count != 0)
+        {
+            <table id="UsersList" class="table table-bordered table-responsive">
+                <thead >
+                    <tr>
+
+                        <th>
+                            @Html.DisplayNameFor(m => m.Users.FirstOrDefault().UserName)
+                        </th>
+                        <th colspan="2" align="center" style="text-align:center;">
+                            Roles
+                        </th>
+                        <th> Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Users)
+                    {
+                        <tr id="item-@item.Id">
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.UserName)
+                            </td>
+
+                            @{
+                                IList<string>
+                                    currentRoles = item.UserRoleRel.Select(x => x.RoleId).ToList();
+                                @foreach (var rol in Model.Roles)
+                                {
+
+                                    string check = currentRoles.Contains(rol.Id) ? "Checked" : "";
+                                    string userId = $"'{item.Id.ToString()}'";
+                                    string roleId = $"'{rol.Id.ToString()}'";
+                                    <td>
+                                        <input type="checkbox" name="@rol.Name" onchange="updateRole(@userId,@roleId);" @check>
+                                        <label for="@rol.Name">@rol.Name</label>
+                                    </td>
+                                }
+                            }
+
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info"> View User </a>
+                                <a onclick="deleteUser('@item.Id', '@item.UserName');" class="btn btn-danger"> Delete User </a>
+                            </td>
+                        </tr>
+                                }
+                </tbody>
+            </table>
+
+
+            @* Pagination Section **@
+
+           
+                var prevDisabled = !Model.Users.HasPreviousPage ? "disabled" : "";
+                var nextDisabled = !Model.Users.HasNextPage ? "disabled" : "";
+          
+
+            <button onclick="NextPage(this)"
+                    data-sortOrder="@ViewData["CurrentSort"]"
+                    data-pageNumber="@(Model.Users.PageIndex - 1)"
+                    data-currentFilter="@ViewData["CurrentFilter"]"
+                    class="btn btn-default @prevDisabled" @prevDisabled>
+                Previous
+            </button>
+
+            <span> @Model.Users.PageIndex </span> <span> / </span> <span> @Model.Users.TotalPages </span>
+
+
+        <button onclick="NextPage(this)"
+                data-sortOrder="@ViewData["CurrentSort"]"
+                data-pageNumber="@(Model.Users.PageIndex + 1)"
+                data-currentFilter="@ViewData["CurrentFilter"]"
+                class="btn btn-default @nextDisabled" @nextDisabled>
+            Next
+        </button>
+
+                }
+                else {
+                    <div class="alert alert-info">
+                        No Results Found
+                    </div>
+
+                }
+
+
+        @* ----------------- **@
+
+
+        <script type="text/javascript">
+         
+            function NextPage(btnClicked) {
+
+                $.ajax({
+                    url: `/Admin/Users/AjaxPage`,
+                    type: "POST",
+                    cache: false,
+                    data: btnClicked.dataset,
+                    success: function (res) {
+                        console.log(res);
+                        $("#contentWrapper").replaceWith(res);
+                    }
+                });
+            }
+            function FilterPage(form) {
+                console.log($(form).serialize())
+                $.ajax({
+                    url: `/Admin/Users/AjaxPage?${$(form).serialize()}`,
+                    type: "POST",
+                    cache: false,
+                    success: function (res) {
+                        console.log(res);
+                        $("#contentWrapper").replaceWith(res);
+                    }
+                });
+                event.preventDefault();
+                return false;
+
+            }
+        </script>
+    </div>
+

@@ -1,0 +1,354 @@
+﻿@model ProductViewModel
+@{
+    ViewData["Title"] = "Edit Product";
+    Methods[] methods = (Methods[])Enum.GetValues(typeof(Methods));
+    IList<Methods> pm = Model.Product.PaymentMethod.Select(p => p.Method).ToList();
+}
+
+@section Styles{
+    <link href="~/lib/bootstrap/dist/css/bootstrap-tagsinput.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap/dist/css/carousel.css" rel="stylesheet" />
+    <style>
+        .input-validation-error {
+            border: solid 1px red
+        }
+
+        /* Caroucel  buttons*/
+        .add-product__image-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            width: 100%;
+            position: absolute;
+            top: 4px;
+            right: 8px;
+        }
+
+        .add-product__image-action {
+            font-size: 2rem;
+            padding: 1.5rem;
+        }
+
+        .add-product__image-action i {
+            color: #444;
+            padding: .5rem;
+        }
+
+        .add-product__image-action i:hover {
+            color: #0088CC;
+        }
+    </style>
+}
+
+
+<div style="margin-top:5rem">
+    <form method="post" enctype="multipart/form-data">
+        <!-- Carousel
+        ================================================== -->
+        <div id="myCarousel" class="carousel slide col-lg-6" data-ride="carousel" data-interval="false">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                <li data-target="#myCarousel" data-slide-to="1" class=""></li>
+                <li data-target="#myCarousel" data-slide-to="2" class=""></li>
+            </ol>
+            <div class="carousel-inner" role="listbox" id="innerContainer">
+
+                @{
+                    string path1, path2, path3;
+                    switch (Model.Product.Images.Count)
+                    {
+                        case 1:
+                            path1 = Model.Product.Images[0].Path;
+                            path2 = "/images/product-grey-7.jpg";
+                            path3 = "/images/product-grey-7.jpg";
+                            break;
+                        case 2:
+                            path1 = Model.Product.Images[0].Path;
+                            path2 = Model.Product.Images[1].Path;
+                            path3 = "/images/product-grey-7.jpg";
+                            break;
+                        case 3:
+                            path1 = Model.Product.Images[0].Path;
+                            path2 = Model.Product.Images[1].Path;
+                            path3 = Model.Product.Images[2].Path;
+                            break;
+                        default:
+                            path1 = "/images/product-grey-7.jpg";
+                            path2 = "/images/product-grey-7.jpg";
+                            path3 = "/images/product-grey-7.jpg";
+                            break;
+                    }
+                }
+                <!-- First Slide -->
+                <div class="item active">
+                    <img class="first-slide" src="@path1" alt="First slide" id="image0">
+                </div>
+
+                <!-- Second Slide -->
+                <div class="item">
+                    <img class="second-slide" src="@path2" alt="Second slide" id="image1">
+                </div>
+
+                <!-- Third Slide -->
+                <div class="item">
+                    <img class="third-slide" src="@path3" alt="Third slide" id="image2">
+                </div>
+
+                <div class="add-product__image-actions">
+                    <div class="add-product__image-action">
+                        <a onclick="AddImage()"><i class="fas fa-plus-square"></i></a>
+                        <a onclick="EditImage()"><i class="fas fa-edit"></i></a>
+                        <a onclick="DeleteImage()"><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                </div>
+            </div>
+            <span class="text-danger" id="imageValidation" style="display:none">*Upload the first image</span>
+        </div>
+        <!-- /.carousel -->
+
+
+        <div class="add-product__data col-lg-6">
+            <h2 style="margin-bottom:3rem">Edit Product</h2>
+
+            <div class="form-controls">
+                <div>
+                    <input asp-for="Product.FK_VendorId" hidden />
+                    <input asp-for="Product.Id" hidden />
+
+                    <div class="form-group">
+                        <label asp-for="Product.Name"> </label>
+                        <input asp-for="Product.Name" class="form-control" />
+                        <span asp-validation-for="Product.Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Product.Description"> </label>
+                        <textarea asp-for="Product.Description" class="form-control"></textarea>
+                        <span asp-validation-for="Product.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Product.Price"> </label>
+                        <input asp-for="Product.Price" class="form-control" id="price" onchange="Price(this)" />
+                        <span asp-validation-for="Product.Price" class="text-danger"></span>
+                    </div>
+                    <div>
+                        @{
+                            string offer = "", noOffer = "";
+                            if (Model.Product.OfferPrice < Model.Product.Price)
+                            { offer = "checked"; }
+                            else
+                            { noOffer = "checked"; }
+                        }
+                        <div class="form-group col-lg-6" style="padding:0px">
+                            <div>
+                                <label>Status</label>
+                            </div>
+                            <input type="radio" name="Sale" value="option1" class="col-lg-1" id="saleRadio" onchange="Radio(true)" @offer />
+                            <label class="col-lg-4" style="padding: 0px" for="saleRadio">On Sale</label>
+
+                            <input type="radio" name="Sale" value="option2" class="col-lg-1" id="noSaleRadio" onchange="Radio(false)" @noOffer />
+                            <label class="col-lg-4" style="padding:0px" for="noSaleRadio">Not On Sale</label>
+                        </div>
+
+                        <div class="form-group col-lg-6">
+                            <div>
+                                <label asp-for="Product.OfferPrice"></label>
+                            </div>
+                            <input asp-for="Product.OfferPrice" class="form-control" id="offerPrice" />
+                            <span asp-validation-for="Product.OfferPrice"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Product.Quantity"></label>
+                        <input asp-for="Product.Quantity" class="form-control" />
+                        <span asp-validation-for="Product.Quantity"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Product.PaymentMethod"></label>
+                        <br />
+                        <div class="col-lg-6">
+                            @{
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    string check = "";
+                                    if (pm.Contains(@methods[i]))
+                                    {
+                                        check = "checked";
+                                    }
+                                    <div>
+                                        <input type="checkbox" value="@methods[i]" name="methods" @check onclick="CheckBox()" />
+                                        <label>@methods[i].ToString()</label>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="col-lg-6">
+                            @{
+                                for (int i = 3; i < 6; i++)
+                                {
+                                    string check = "";
+                                    if (pm.Contains(@methods[i]))
+                                    {
+                                        check = "checked";
+                                    }
+                                    <div>
+                                        <input type="checkbox" value="@methods[i]" name="methods" @check onclick="CheckBox()" />
+                                        <label>@methods[i].ToString()</label>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <input type="text" value="false" name="flags" id="checkbox" hidden />
+                        <span class="text-danger" style="display:none" id="methodValidation">*Choose at least one Method</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Product.FK_CategoryId"></label>
+                        <select asp-for="Product.FK_CategoryId" asp-items="@new SelectList(Model.Categories,nameof(Category.Id),nameof(Category.Name))" class="form-control">
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tags</label>
+                        <select multiple data-role="tagsinput" name="productTags" id="productTags" asp-items="@new SelectList(Model.ProductTags, nameof(Tag.Name), nameof(Tag.Name))" onchange="ChangeTags()">
+                        </select>
+                        <input type="text" value="false" name="flags" id="changeTags" hidden />
+                        <span class="text-danger" style="display:none" id="tagValidation">*Insert at least one tag</span>
+                    </div>
+
+                    <!-- Images uploads -->
+                    <input type="text" value="false" name="flags" id="flag0" hidden />
+                    <input asp-page-handler="Upload" type="file" accept="image/*" value="Upload" name="images" onchange="ImageUploaded(this)" id="upload0" style="display:none" />
+                    <input type="text" value="false" name="flags" id="flag1" hidden />
+                    <input asp-page-handler="Upload" type="file" accept="image/*" value="Upload" name="images" onchange="ImageUploaded(this)" id="upload1" style="display:none" />
+                    <input type="text" value="false" name="flags" id="flag2" hidden />
+                    <input asp-page-handler="Upload" type="file" accept="image/*" value="Upload" name="images" onchange="ImageUploaded(this)" id="upload2" style="display:none" />
+
+                    <div>
+                        <a asp-action="Index" class="btn btn-warning col-lg-offset-7 col-lg-2"> Cancel</a>
+                        <button class="btn btn-primary col-lg-offset-1 col-lg-2" onclick="return Submit()"> Edit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@section SCripts{
+    <partial name="_ValidationScriptsPartial.cshtml" />
+    <script src="~/lib/bootstrap/dist/js/bootstrap-tagsinput.js"></script>
+    <script>
+        //runs after the page loads
+        (function () {
+            //make offerprice readonly if no discount
+            if ($('#noSaleRadio').prop('checked'))
+                $('#offerPrice').attr('readonly', 'readonly');
+            //make 'space' the confirm key for tags
+            $('#productTags').tagsinput({
+                confirmKeys: [32]
+            });
+        })();
+
+        //make offerprice = price if no discount
+        function Price(price) {
+            if ($('#noSaleRadio').prop('checked'))
+                $('#offerPrice').val(price.value);
+        }
+
+        //change offer price readonly according to radio buttons
+        function Radio(flag) {
+            if (flag)
+                $('#offerPrice').removeAttr('readonly');
+            else {
+                $('#offerPrice').val($('#price').val());
+                $('#offerPrice').attr('readonly', 'readonly');
+            }
+        }
+
+        //starts the input(file) when carousel icons (add) is clicked
+        function AddImage() {
+            currentIndex = $('div.active').index();
+            $(`#upload${currentIndex}`).click();
+        }
+
+        //starts the input(file) when carousel icons (add & edit) are clicked
+        function EditImage() {
+            currentIndex = $('div.active').index();
+            if ($(`#image${currentIndex}`).attr('src') != '/images/product-grey-7.jpg')
+                $(`#upload${currentIndex}`).click();
+        }
+
+        //removes the input(file) when carousel icon (delete) is clicked
+        function DeleteImage() {
+            currentIndex = $('div.active').index();
+            if ($(`#image${currentIndex}`).attr('src') != '/images/product-grey-7.jpg') {
+                $(`#image${currentIndex}`).attr('src', '/images/product-grey-7.jpg')
+                $(`#upload${currentIndex}`).val('');
+                $(`#flag${currentIndex}`).val('delete');
+            }
+        }
+
+        //displays the uploaded image
+        function ImageUploaded(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    currentIndex = $('div.active').index();
+                    $(`#image${currentIndex}`).attr('src', e.target.result);
+                    if (currentIndex == 0) {
+                        $('#imageValidation').css('display', 'none');
+                        $('#innerContainer').removeClass('input-validation-error');
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function CheckBox() {
+            $('#checkbox').val('changeMethods');
+        }
+
+        function ChangeTags() {
+            $('#changeTags').val('changeTags');
+        }
+
+        //set the values of flags when images are changed
+        function Submit() {
+            let result = false;
+            //Ensure that at least one payment method is selected
+            let methods = document.getElementsByName("methods");
+            for (var i = 0; i < methods.length; i++) {
+                if (methods[i].checked) {
+                    result = true;
+                    break;
+                }
+            }
+            if (!result)
+                $('#methodValidation').css('display', 'inline-block');
+             
+
+            //Ensure that at least one tag is added
+            if (!$('#productTags').val().length) {
+                $('#tagValidation').css('display', 'inline-block');
+                result = false;
+            }
+
+            //Ensure that the first image is uploaded or not deleted                
+            if (!$('#upload0').val() && $(`#image0`).attr('src') == '/images/product-grey-7.jpg') {
+                $('#imageValidation').css('display', 'inline-block');
+                $('#innerContainer').addClass('input-validation-error');
+                result = false;
+            }
+
+            for (var i = 0; i < 3; i++) {
+                if ($(`#upload${i}`).val()) {
+                    $(`#flag${i}`).val('change');
+                }
+            }
+            return result;
+        }
+    </script>
+}

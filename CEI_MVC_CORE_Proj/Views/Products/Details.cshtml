@@ -1,0 +1,156 @@
+﻿@model ProductViewModel
+@{
+    ViewData["Title"] = "Product Details";
+}
+
+@section Styles{
+    <link href="~/lib/bootstrap/dist/css/carousel.css" rel="stylesheet" />
+    <link href="~/css/style.css" rel="stylesheet" />
+}
+
+
+<div style="margin-top:5rem">
+    <div class="col-lg-12" style="padding:0px" id="productContainer" data-id="@Model.Product.Id" data-maxqty="@Model.Product.Quantity">
+        <div id="myCarousel" class="carousel slide col-lg-6" data-ride="carousel" data-interval="false">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                @for (int i = 1; i < Model.Product.Images.Count; i++)
+                {
+                    <li data-target="#myCarousel" data-slide-to="@i" class=""></li>
+                }
+            </ol>
+
+            <div class="carousel-inner" role="listbox">
+                <!-- First Slide -->
+                <div class="item active">
+                    <img class="first-slide" id="productImg" src="@Model.Product.Images[0].Path" alt="First slide" id="image0">
+                </div>
+
+                @for (int i = 1; i < Model.Product.Images.Count; i++)
+                {
+                    <!-- ith Slide -->
+                    <div class="item">
+                        <img class="second-slide" src="@Model.Product.Images[i].Path" alt="Second slide" id="image\@i">
+                    </div>
+                }
+            </div>
+        </div>
+        <!-- /.carousel -->
+
+
+        <div class="col-lg-6">
+            <h2><b id="productName">@Model.Product.Name</b></h2>
+            <div class="rating">
+                <div class="rating__stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+                <div class="rating__data">
+                    2 reviews
+                </div>
+            </div>
+            <div style="margin-bottom:3rem">
+                @if (@Model.Product.OfferPrice < @Model.Product.Price)
+                {
+                    <h3 style="display:inline-block;margin-right:15px"><del style="font-size:inherit    ">@Model.Product.Price LE</del></h3>
+                    <h3 style="display:inline-block" id="productPrice">@Model.Product.OfferPrice LE</h3>
+                }
+                else
+                {
+                    <h3  id="productPrice">@Model.Product.Price LE</h3>
+                }
+
+            </div>
+
+            <div style="margin-bottom:3rem">
+                <h5 style="line-height:20px">
+                    @Model.Product.Description Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempus nibh sed elimttis adipiscing.
+                    Fusce in hendrerit purus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempus nibh
+                    sed elimttis adipiscing. Fusce in hendrerit purus.
+                </h5>
+            </div>
+
+            <div class="col-lg-12" style="margin-bottom:5px;padding:0px">
+                <div class="btn-group col-lg-4" role="group" aria-label="..." style="padding:0px">
+                    <button type="button" class="btn btn-default col-lg-3" onclick="ChangeValue(false)">-</button>
+                    <input type="text" value="1" class="col-lg-4" style="font-size:2rem;" id="purchaseQuantity" onchange="ValidateNumber(this)" />
+                    <button type="button" class="btn btn-default col-lg-3" onclick="ChangeValue(true)">+</button>
+                </div>
+                <button href="#" class="btn btn-primary col-lg-3" onclick="addMultipleToCart()">Add to cart</button>
+            </div>
+            @if(Model.Product.Quantity < 10)
+            {
+                <span style="color:red">*Only @Model.Product.Quantity in stock</span>
+            }
+            else
+            {
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+            }
+            <div>
+                <h5>Category : @Model.Product.Category.Name</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12" style="margin-bottom:5rem;font-size:15px">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Description</a></li>
+            <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Additional Information</a></li>
+            <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Reviews</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content" style="border:solid 0.5px #cdcbcb;padding:2rem">
+            <div role="tabpanel" class="tab-pane active" id="home">
+                Xiaomi Mi Wireless Mouse has a built-in sensor. This Xiaomi Mouse has a right-hand design. The Xiaomi Mi Wireless Mouse delivers fast scrolling and smooth gliding on any surface. It is just the right companion for your computer. This wireless mouse has 2.4GHz carrier frequency that offers excellent connection. The four button design with a back key water and dust resistant coating ensures functionality and durability. The Xiaomi mouse has a right-hand design that offers a comfortable grip and a frustration-free experience. This mouse has gone through a UV-process that makes the surface shiny and smooth. The user-friendly design offers convenient use of this device. If you use the wireless mouse for 8 hours in a day, it is sturdy enough to stay with you for years to come.
+            </div>
+            <div role="tabpanel" class="tab-pane" id="profile">
+                The Xiaomi Mi Wireless Mouse offers a user-friendly interface. With its contoured shape, this mouse provides a comfortable grip. It has gone through the UV process that makes it shiny and smooth. To hide the battery and dongle, the top of the mouse serves as a detachable lid. The left side of the mouse a key that is preassigned to get you one step backward. Thanks to the anti-fouling coating, this mouse has a high-friction resistance. The infrared sensor on this mouse makes it accurate up to 1200dpi. For seamless functionality, you can pair it with one of Xiaomi Rainbow 5 AA batteries. Furthermore, it also has a built-in power saver mode.
+            </div>
+            <div role="tabpanel" class="tab-pane" id="messages">
+                The Xiaomi Mi Mouse has 2.4GHz carrier frequency that lets you enjoy excellent connection. Its four button design with a back key functionality allows you to do your task efficiently. This mouse offers an easy setup, you just have to plug in the dongle into the device and get the work started. It only weighs 8.2g that makes it an ideal choice for carrying it wherever you go.
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12" style="padding:2rem">
+        <div class="col-lg-12" style="border:solid 0.5px #cdcbcb;">
+            <div class="col-lg-12">
+                <h3 class="col-lg-3">Related Products</h3>
+                <partial name="_RelatedProductsPartial" model="Model.Products" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{ 
+    <script>        
+        function ValidateNumber(input) {
+            if (!Number(input.value)) {
+                input.value = 1;
+            }
+            if(input.value < 1)
+                input.value = 1;
+        }
+
+        ////////////////////////////////////////////////////////////
+        function ChangeValue(flag) {
+            var input = document.getElementById('purchaseQuantity');
+            if (flag)
+                input.value = input.value*1 + 1;
+            else {
+                if (input.value > 1)
+                    input.value--;
+            }        
+    }
+    </script>
+}

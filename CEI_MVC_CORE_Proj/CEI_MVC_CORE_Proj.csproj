@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <UserSecretsId>aspnet-CEI_MVC_CORE_Proj-3FF4D1B6-DFDD-4C77-8B00-AF94B3176CB9</UserSecretsId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>E:\ITI\Learn ASP.NET\ASPMvcCore-e4d364d8b8ba36205c5660ef233e25d12f4caebf\CEI_MVC_CORE_Proj\CEI_MVC_CORE_Proj.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  <NoWarn>$(NoWarn);1591</NoWarn>
+</PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20200405200726_RemoveSaleAndCorrectSpelling.cs" />
+    <Compile Remove="Data\Migrations\20200405200726_RemoveSaleAndCorrectSpelling.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200424111206_Seeding Init Data.cs" />
+    <Compile Remove="Data\Migrations\20200424111206_Seeding Init Data.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200424113803_Seeding Init Data.cs" />
+    <Compile Remove="Data\Migrations\20200424113803_Seeding Init Data.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200424114336_Seeding Init Data.cs" />
+    <Compile Remove="Data\Migrations\20200424114336_Seeding Init Data.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200424120140_Seeding Init Data.cs" />
+    <Compile Remove="Data\Migrations\20200424120140_Seeding Init Data.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200424130335_Seeding Init Data.cs" />
+    <Compile Remove="Data\Migrations\20200424130335_Seeding Init Data.Designer.cs" />
+    <Compile Remove="Data\Migrations\20200424130819_Seeding Init Data.cs" />
+    <Compile Remove="Data\Migrations\20200424130819_Seeding Init Data.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.10" />
+    <PackageReference Include="SendGrid" Version="9.13.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.3.3" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="Areas\Admin\Models\" />
+    <Folder Include="Areas\Admin\Views\Shared\" />
+    <Folder Include="Areas\API\Data\" />
+    <Folder Include="Areas\API\Models\" />
+    <Folder Include="Areas\API\Views\" />
+    <Folder Include="Areas\Vendor\Data\" />
+    <Folder Include="Areas\Vendor\Models\" />
+    <Folder Include="Services\" />
+    <Folder Include="wwwroot\images\ProductImages\" />
+  </ItemGroup>
+
+</Project>

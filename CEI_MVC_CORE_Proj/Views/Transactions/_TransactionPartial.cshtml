@@ -1,0 +1,54 @@
+﻿@model PaginatedList<Transaction>
+
+    <div id="transactionsTable">
+        @if (Model.Count > 0)
+        {
+            <table table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Checkout Id</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Payment Method</th>
+                        <th>Vendor</th>
+                        <th>DateTime</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    @foreach (Transaction item in Model)
+                    {
+                        <partial name="_TransactionRowPartial" model="item" />
+                    }
+                </tbody>
+            </table>
+            <nav aria-label="..." id="TransactionPage">
+                <ul class="pagination" style="cursor:pointer">
+
+                    <li onclick="Previouspage()">
+                        <a aria-label="Next">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="active" onclick="Page(1)" id="1"><a>1</a></li>
+                    @for (int i = 2; i <= Model.TotalPages; i++)
+                    {
+                        <li class="" onclick="Page(@i)" id="@i"><a>@i</a></li>
+                    }
+                    <li onclick="Nextpage()">
+                        <a aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                No Transactions found.
+            </div>
+        }
+    </div>

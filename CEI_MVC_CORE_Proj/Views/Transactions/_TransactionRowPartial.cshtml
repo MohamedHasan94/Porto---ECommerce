@@ -1,0 +1,19 @@
+﻿@model Transaction
+
+
+<tr id="@Model.Id">
+    <td>@Model.CheckOutId</td>
+    <td>@Model.Product.Name</td>
+    <td>@Model.Quantity</td>
+    <td>@Model.Product.OfferPrice</td>
+    <td>@Model.PaymentMethod</td>
+    <td>@Model.Product.Vendor.UserName</td>
+    <td>@Model.DateTime</td>
+    <td>@Model.Status</td>
+    <td>
+        @if (Model.Status == TransactionStatus.Pending)
+        {
+            <button class="btn btn-danger" onclick="ChangeStatus(@Model.Id  , 'Cancelled')">Cancel</button>
+        }
+    </td>
+</tr>

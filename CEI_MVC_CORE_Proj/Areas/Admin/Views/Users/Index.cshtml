@@ -1,0 +1,62 @@
+﻿@model UsersViewModel
+@*@model  IEnumerable<AppUser>
+*@
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+
+<h2>Users</h2>
+<hr />
+
+
+
+<partial name="_PartialUsersList" model="Model" />
+
+
+
+@section Scripts{
+    <script type="text/javascript">
+        function updateRole(UserId, RoleId) {
+            var checked = (event.target.checked);
+            $("#msg").text("Sending ..");
+            $.ajax({
+                url: '/Admin/Users/UpdateRole',
+                method: "POST",
+                data: {
+                    UserId: UserId,
+                    RoleId: RoleId,
+                    IsChecked: checked
+                },
+                success: (res) => {
+                    if (res.succeeded) {
+                        $("#msg").text(`SUCCESS! The Role was changed successfully, after they re login or restart their session`);
+                        $("#msg").css("display", "block");
+                    } else {
+                        $("#msg").text("")
+                    }
+                }
+            });
+        }
+        function deleteUser(userId, userName) {
+            if (confirm(`Are you sure you want to delete User: ${userName}?`)) {
+                $.ajax({
+                    url: '/Admin/Users/Delete',
+                    method: "POST",
+                    data: {
+                        Id: userId
+                    },
+                    success: (res) => {
+                        if (res.succeeded) {
+                            $("#item-" + userId).remove();
+                        } else {
+                            $("#msg").text("")
+                        }
+                    }
+                });
+
+            }
+        }
+    </script>
+}

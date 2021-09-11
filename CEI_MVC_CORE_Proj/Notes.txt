@@ -1,0 +1,2 @@
+Paging 
+https://www.reflectionit.nl/blog/2017/paging-in-asp-net-core-mvc-and-entityframework-core

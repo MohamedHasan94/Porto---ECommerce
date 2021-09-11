@@ -1,0 +1,48 @@
+﻿@model AppUser
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<h2>User <span class="text-info"> @Model.UserName </span> | Details</h2>
+<table class="table table-striped">
+
+    <tbody>
+        <tr>
+            <td>User Name</td>
+            <td> @Model.UserName</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td> @Model.Email</td>
+        </tr>
+        <tr>
+            <td>Email Confirmed</td>
+            <td> @Model.EmailConfirmed</td>
+        </tr>
+        <tr>
+            <td>Products owned </td>
+            <td> @Model.Products.Count</td>
+        </tr>
+    </tbody>
+</table>
+<a asp-area="admin" asp-controller="Users" asp-action="Index" class="btn btn-primary"> < Back To List </a>
+<a onclick="deleteUser('@Model.Id', '@Model.UserName');" class="btn btn-danger"> Delete User </a>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        function deleteUser(userId, userName) {
+            if (confirm(`Are you sure you want to delete User: ${userName}?`)) {
+                $.ajax({
+                    url: `/Admin/Users/Delete/${userId}`,
+                    method: "POST",                    
+                    success: (res) => {
+                        if (res.succeeded) {
+                            window.location.href ="/admin/users/index"
+                        } 
+                    }
+                });
+            }
+        }
+    </script>
+}

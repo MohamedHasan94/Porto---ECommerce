@@ -1,0 +1,198 @@
+﻿@model ProductViewModel
+@{
+    ViewData["Title"] = "Products";
+}
+
+@section Styles{
+    <link href="~/css/style.css" rel="stylesheet" />
+
+    <style>
+        .activeCat , .activeTag {
+            background-color: cyan
+        }
+    </style>
+}
+<div id=""></div>
+
+<!-- Listing Items -->
+<div style="margin-top: 5rem; display: flex">
+    <!-- filters -->
+    <section class="filters">
+        <!-- search box -->
+        <div class="search-box">
+            <input class="search-box__input" placeholder="Search..." type="text" name="txt_search" id="searchBox">
+            <button type="submit" class="search-box__btn" onclick="Search()">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <!-- filter list -->
+        <div>
+            <!-- filter header -->
+            <h3>Categories</h3>
+            <!-- filter list -->
+            <ul class="list list--vr-separator" style="font-size:15px" asp>
+                @foreach (Category category in Model.Categories)
+                {
+                    <li class="link list__item" onclick="CategoryFilter(this , @category.Id)" id="cat\@category.Id"><i class="link__icon fas fa-angle-right"></i>@category.Name</li>
+                }
+            </ul>
+        </div>
+        <!-- filter tags -->
+        <div>
+            <!-- filter header -->
+            <h3>Tags</h3>
+            <!-- filter tags -->
+            <div class="tags" style="font-size:15px">
+                @foreach (Tag tag in Model.Tags)
+                {
+                    <span class="tag  btn" onclick="TagFilter(this ,@tag.Id)">@tag.Name</span>
+                }
+            </div>
+        </div>
+
+    </section>
+    <!-- Items -->
+    <section class="item-listing">
+        <!-- tools (sorting , change view , exporting) -->
+        <div class="item-listing__tools">
+            <select class="form-control" name="" id="order" onchange="Order(this)">
+                <option value="featured">Featured</option>
+                <option value="priceAsc">Price low to high</option>
+                <option value="priceDsc">Price high to low</option>
+                <option value="nameDsc">Name Descending</option>
+            </select>
+
+            <!-- Clear filters -->
+            <div class="form-group ">
+                <button class="btn btn-default" onclick="RemoveFilters()"><img height="15" src="~/images/Filter-Delete-32.png" /></button>
+            </div>
+        </div>
+
+        <!-- items -->
+        <partial name="_ProductsPartial" model="Model.Products" />
+    </section>
+</div>
+
+@section Scripts{
+    <script>
+        var categoryId = [] , tagId = null , order = 'featured' , searchString = '';
+
+        //////////////////////////////////////
+        function Previouspage() {
+            var previous = parseInt($('.active').attr('id')) - 1;
+            if (previous) {
+                $(`#${previous}`).click();
+            }
+        }
+
+        //////////////////////////////////////
+        function Nextpage() {
+            var next = parseInt($('.active').attr('id')) + 1;
+            if (!(next > @Model.Products.TotalPages)) {
+                $(`#${next}`).click();
+            }
+        }
+
+        ////////////////////////////////////////
+        function Page(no) {
+            newIndex = no;
+            GetProducts(no);
+        }
+
+        ////////////////////////////////////////
+        function ChangeActivePage(pageNo) {
+            $('.active').removeClass('active');
+            $(`#${pageNo}`).addClass('active');
+        }
+
+
+        ///////////////////////////////////////////
+        function CategoryFilter(current, catId) {
+            if (current.classList.contains('activeCat')) {
+                current.classList.remove('activeCat');
+                const index = categoryId.indexOf(catId);
+                if (index > -1) {
+                    categoryId.splice(index, 1);
+                }
+            }
+            else
+            {
+                current.classList.add('activeCat');
+                categoryId.push(catId);
+            }
+            GetProducts();
+        }
+
+        ////////////////////////////////////////
+        function TagFilter(current, tId) {
+            var prevTag = document.getElementsByClassName('activeTag')[0];
+            if (prevTag != current) {
+                current.classList.add('activeTag');
+                tagId = tId;
+            }
+            else
+            {
+                tagId = null;
+            }
+            if (prevTag)
+                prevTag.classList.remove('activeTag');
+            GetProducts();
+        }
+
+        ///////////////////////////////////////
+        function Order(self) {
+            order = self.value;
+            GetProducts();
+        }
+
+        ////////////////////////////////////////
+        function Search() {
+            searchString = $('#searchBox').val();
+            GetProducts();
+        }
+
+        //////////////////////////////////////////
+        function RemoveFilters() {
+            $('.activeCat').removeClass('activeCat');
+            categoryId = [];
+            $('.activeTag').removeClass('activeTag');
+            tagId = null;
+            order = 'featured';
+            $('#order').val('featured');
+            searchString = '';
+            $('#searchBox').val('');
+            GetProducts();
+        }
+
+
+        /////////////////////////////////////////
+        function GetProducts(pageNo, search = null) {
+            if (!pageNo) {
+                pageNo = 1;
+                newIndex = 1;
+            }
+
+            search = search || $('#searchBox').val() ? ('&search=' + $('#searchBox').val() || search) : '';
+
+            var categoryQuery = '';
+            for (var i in categoryId) {
+                categoryQuery += `&categoryId=${categoryId[i]}`
+            }
+
+            $.ajax({
+                url: `/Products/AjaxPage?pageno=${pageNo}&order=${order}${categoryQuery}&tagId=${tagId}&search=${searchString}`,
+                type: "POST",
+                cache: false,
+                success: function (res) {
+                    $('#productPage').remove();
+                    $("#productList").replaceWith(res);
+                    ChangeActivePage(pageNo);
+                },
+                error: function () {
+                    console.log('error')
+                }
+            });
+            }
+    </script>
+}
+

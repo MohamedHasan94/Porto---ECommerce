@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CEI_MVC_CORE_Proj</name>
+    </assembly>
+    <members>
+        <member name="M:CEI_MVC_CORE_Proj.Areas.Admin.Controllers.UsersController.UpdateRole(System.String,System.String,System.Boolean)">
+            <summary>
+            The Updated role will take effect in the next user session, therefore he should logout and re login first
+            </summary>
+        </member>
+        <member name="T:CEI_MVC_CORE_Proj.Areas.API.Controllers.RequestsController">
+            <summary>
+            API Controller For the requests entity, 
+            It allows you to list and view the requests that the users sent for the admin to review
+            you can change status (approve/ reject / delete ) the requests
+            user: admin
+            pass: P@ssw0rd
+            To View Documentation Go To : localhost:"port"/swagger
+            Made By: Abdelrahman Osama
+            </summary>
+        </member>
+        <member name="M:CEI_MVC_CORE_Proj.Areas.API.Controllers.RequestsController.GetRequests(System.String,System.String,System.String,System.Nullable{System.Int32})">
+            <summary>
+            Retrieves the requests for the admin (Users requesting to be vendors, or Vendors Requesting to add new category)
+            </summary>
+            <param name="sortOrder"> Optional </param>
+            <param name="currentFilter">Optional </param>
+            <param name="searchString"> Optional </param>
+            <param name="pageNumber">Optional</param>
+            <returns> Paged List of Requests </returns>
+        </member>
+        <member name="M:CEI_MVC_CORE_Proj.Areas.API.Controllers.RequestsController.GetRequests(System.Int32)">
+            <summary>
+            Retrieves Specific Request, you have to provide the id of the request in the route
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CEI_MVC_CORE_Proj.Areas.API.Controllers.RequestsController.PostRequests(CEI_MVC_CORE_Proj.Models.RequestToAdmin)">
+            <summary>
+            Creates a new request in the database
+            </summary>
+            <param name="request"> Don't provide the Id , only the data, fk_userid, type parameters</param>
+            <returns></returns>
+        </member>
+        <member name="M:CEI_MVC_CORE_Proj.Areas.API.Controllers.RequestsController.PutRequests(System.Int32,CEI_MVC_CORE_Proj.Models.RequestToAdmin)">
+            <summary>
+             Edit an existing request
+            </summary>
+            <param name="id"> From the route  api/Requests/{id}</param>
+            <param name="requestToAdmin"> the data of the request</param>
+            <returns></returns>
+        </member>
+        <member name="M:CEI_MVC_CORE_Proj.Areas.API.Controllers.RequestsController.DeleteRequestToAdmin(System.Int32)">
+            <summary>
+            Deletes Specific Request, you have to provide the id of the request in the route
+            </summary>
+            <param name="id">the id of the request to be deleted</param>
+            <returns></returns>
+        </member>
+        <member name="T:CEI_MVC_CORE_Proj.Areas.API.Controllers.TransactionsController">
+            <summary>
+            API Controller For the Transaction entity, 
+            It allows you to list and view the Transactions that the users made to buy from vendor
+            you can change the Transaction status (Shipped/ Completed / Rejected )
+            user: vendor
+            pass: P@ssw0rd
+            To View Documentation Go To : localhost:"port"/swagger
+            Made By: Mohamed Gamal
+            </summary>
+        </member>
+        <member name="M:CEI_MVC_CORE_Proj.Areas.API.Controllers.TransactionsController.GetTransactions(System.String,System.String,System.Nullable{System.Int32})">
+            <summary>
+            Retrieves the Transactions for the vendor (Users orders from this vendors)
+            </summary>
+            <param name="sortOrder"> Optional </param>
+            <param name="searchString"> Optional </param>
+            <param name="pageNumber">Optional</param>
+            <returns> Paged List of Transactions </returns>
+        </member>
+        <member name="M:CEI_MVC_CORE_Proj.Areas.API.Controllers.TransactionsController.GetTransactions(System.Int32)">
+            <summary>
+            Retrieves Specific Transaction, you have to provide the id of the Transaction in the route
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CEI_MVC_CORE_Proj.Areas.API.Controllers.TransactionsController.PostTransaction(CEI_MVC_CORE_Proj.Models.Transaction)">
+            <summary>
+            Creates a new Transaction in the database
+            </summary>
+            <param name="transaction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CEI_MVC_CORE_Proj.Areas.API.Controllers.TransactionsController.PutTransaction(System.Int32,CEI_MVC_CORE_Proj.Models.Transaction)">
+            <summary>
+             Edit an existing Transaction
+            </summary>
+            <param name="id"> From the route  api/Transaction/{id}</param>
+            <param name="transaction"> the data of the transaction</param>
+            <returns>Transaction</returns>
+        </member>
+        <member name="M:CEI_MVC_CORE_Proj.Areas.API.Controllers.TransactionsController.DeleteTransaction(System.Int32)">
+            <summary>
+            Deletes Specific Transaction, you have to provide the id of the Transaction in the route
+            </summary>
+            <param name="id">the id of the Transaction to be deleted</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,36 @@
+﻿@model List<Product>
+
+<div class="item-listing__items item-listing--4items" style="width:100%" id="productList">
+    <!-- medium item -->
+
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        <div class="item-medium-1">
+            @if (Model[i].OfferPrice < Model[i].Price)
+            {
+                <div class="item-medium-1__alert">Sale</div>
+            }
+            <div class="item-medium-1__image image" style="background-image: url('@Model[i].Images[0].Path')">
+           @*     <a href="#" class="item-medium-1__action">Add to Cart</a>*@
+            </div>
+            <a asp-action="Details" asp-route-id="@Model[i].Id">
+                <h4>@Model[i].Name</h4>
+                <div class="flex-row">
+                    <div>
+                        <del>@Model[i].Price LE</del>
+                        <span class="lable">@Model[i].OfferPrice LE</span>
+                    </div>
+                </div>
+            </a>
+            @if (User.IsInRole("Admin,Vendor"))
+            {
+                <div class="crud-actions">
+                    <a href="#"><i class="far fa-eye"></i></a>
+                    <a href="#"><i class="fas fa-edit"></i></a>
+                    <a href="#"><i class="fas fa-trash-alt"></i></a>
+                </div>
+            }
+
+        </div>
+    }
+</div>

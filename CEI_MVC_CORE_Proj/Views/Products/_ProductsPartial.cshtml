@@ -1,0 +1,65 @@
+﻿@model PaginatedList<Product>
+<div class="item-listing" id="productList">
+    <!-- medium item -->
+    @if (Model.Count > 0)
+    {
+        <div class="item-listing__items item-listing--3items" style="width:100%">
+            @foreach (Product item in Model)
+            {
+                    <div class="item-medium-1" id="P_@item.Id">
+                    @if (item.OfferPrice < item.Price)
+                    {
+                        <div class="item-medium-1__alert">Sale</div>
+                    }
+                    <div class="item-medium-1__image image" style="background-image: url('@item.Images[0].Path')">
+                        <button  href="#" data-productId="@item.Id" onclick="addToCart(this)" class="item-medium-1__action">Add to Cart</button>
+                    </div>
+                    <a asp-action="Details" asp-route-id="@item.Id">
+                        <h4>@item.Name</h4>
+                        <div class="flex-row">
+                            <div>
+                                @if (item.OfferPrice < item.Price)
+                                {
+                                    <del>@item.Price LE</del>
+                                    <span class="lable">@item.OfferPrice LE</span>
+                                }
+                                else
+                                {
+                                    <span class="lable">@item.Price LE</span>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+
+        </div>
+
+        <nav aria-label="...">
+            <ul class="pagination" style="cursor:pointer">
+
+                <li onclick="Previouspage()">
+                    <a aria-label="Next">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="active" onclick="Page(1)" id="1"><a>1</a></li>
+                @for (int i = 2; i <= Model.TotalPages; i++)
+                {
+                    <li class="" onclick="Page(@i)" id="@i"><a>@i</a></li>
+                }
+                <li onclick="Nextpage()">
+                    <a aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+    else
+    {
+        <div class="alert alert-info" style="width:100%">
+            No products found.
+        </div>
+    }
+</div>

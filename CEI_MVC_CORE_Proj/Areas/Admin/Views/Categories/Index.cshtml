@@ -1,0 +1,247 @@
+﻿@model CategoryViewModel
+@{
+    ViewData["Title"] = "Categories";
+}
+
+@section Styles{
+    <style>
+        .input-validation-error {
+            border: solid 1px red
+        }
+    </style>
+}
+
+<br />
+<a class="btn btn-primary" data-toggle="modal" data-target="#categoryModal" onclick="addCategory()">Add new Category</a>
+<br />
+<h2>Categories</h2>
+<br />
+
+<div class="alert alert-info" style="display:none" id="message">
+    No Categories found , please add.
+</div>
+
+<!-- filters -->
+<section id="filters" class="row">
+    <!-- Order -->
+    <div class="form-group col-lg-4">
+            <span style="font-size:medium">Sort By:</span>
+        <select class="form-control" style="width:auto;display:inline-block" name="" id="order" onchange="Order(this)">
+            <option value="featured">Featured</option>
+            <option value="productsAsc">No. of products Asc</option>
+            <option value="productsDsc">No. of products Dsc</option>
+            <option value="nameDsc">Name Descending</option>
+        </select>
+    </div>
+
+    <!-- search box -->
+    <div class="form-group col-lg-push-4 col-lg-3">
+        <input class="form-control" style="width:auto;display:inline-block" placeholder="Search..." type="text" name="txt_search" id="search">
+        <button class="btn btn-info" onclick="Search()">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+
+    <div class="form-group col-lg-push-4 col-lg-2">
+        <button class="btn btn-default" onclick="RemoveFilters()"><img height="20" src="~/images/Filter-Delete-32.png" /></button>
+    </div>
+</section>
+<partial name="_CategoryPartial" model="@Model.Categories"/>
+@if (Model.Categories.Count == 0)
+{
+    <script>
+        $('#message').css('display', 'block');
+        $('#categoriesTable').css('display', 'none');
+    </script>
+}
+
+
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModal" aria-hidden="true" onabort="Log()">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Add Category</h4>
+            </div>
+
+            <form method="post" id="form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label asp-for="Category.Name"></label>
+                        <input asp-for="Category.Name" type="text" class="form-control" />
+                        <span asp-validation-for="Category.Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button class="btn btn-primary" id="formButton"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        //Prevent Editing or deleting "Others" category
+        $('#15 button').remove();
+
+        var action = '';
+
+        @* Add Category *@
+        function addCategory() {
+            action = 'Add';
+            $("#formButton").html('Add');
+            $('#myModalLabel').text('Add Category');
+        }
+
+        @* Edit Category *@
+        function editCategory(id, name) {
+            action = 'Edit';
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'Category_Id',
+                name: 'Category.Id',
+                value : `${id}`
+                }).appendTo('#form');
+            $("#formButton").html('Edit');
+            $(`#${id}`).attr('id', 'replace');
+            $('#form #Category_Name').val(name);
+            $('#myModalLabel').text('Edit Category');
+        }
+
+        //Remove hidden input if the user doesn't complete the edit
+        $('#categoryModal').on('hidden.bs.modal', function () {
+            $('#Category_Id').remove();
+        })
+
+        $("#form").submit(function (event) {
+            event.preventDefault(); //prevent default action
+            var data = $(this).serialize(); //Encode form elements for submission
+            $.ajax({
+                url: `/Admin/Categories/${action}`,
+                type: "POST",
+                data: data,
+                success: function (res) {
+                    document.getElementById('form').reset();
+                    $('#categoryModal').modal('hide');
+                    $('#message').css('display', 'block');
+                    if (action == 'Add') {
+                        $('#tbody').append(res);
+                        $('#message').text('Category added successfully.');
+                        if (document.getElementById('tbody').childElementCount == 1) {
+                            $('#noCategories').css('display', 'none');
+                            $('#categoriesTable').css('display', 'table');
+                        }
+                    }
+                    else {
+                        $('#Category_Id').remove();
+                        $(`#replace`).replaceWith(res);
+                        $('#message').text('Category edited successfully.');
+                    }
+                }
+            });
+        });
+
+        function ConfirmDelete(id) {
+            if (confirm('Are you sure to delete?\nIf you delete a category , all its products will be moved to "Others"')) {
+                $.ajax({
+                    url: `/Admin/Categories/Delete/${id}`,
+                    type: "POST",
+                    cache: false,
+                    success: function (res) {
+                        if (res) {
+                            $(`#${id}`).remove();
+                            $(`#message`).css('display', 'block');
+                            $(`#message`).text('Category deleted successfully');
+                            if (document.getElementById('tbody').childElementCount == 0) {
+                                $('#noCategories').css('display', 'block');
+                                $('#categoriesTable').css('display', 'none');
+                            }
+                        }
+                        else
+                            $(`#message`).text('Proccess failed, please try again');
+                    },
+                    error: function () {
+                        $(`#message`).text('Proccess failed, please try again');
+                    }
+                });
+            }
+        }
+        ////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////
+
+        var order = 'featured', searchString = '';
+
+        //////////////////////////////////////
+        function Previouspage() {
+            let previous = parseInt($('.active').attr('id')) - 1;
+            if (previous) {
+                $(`#${previous}page`).click();
+            }
+        }
+
+        //////////////////////////////////////
+        function Nextpage() {
+            let next = parseInt($('.active').attr('id')) + 1;
+            if (!(next > @Model.Categories.TotalPages)) {
+                $(`#${next}page`).click();
+            }
+        }
+
+        ////////////////////////////////////////
+        function Page(no) {
+            GetCategories(no);
+        }
+
+        ////////////////////////////////////////
+        function ChangeActivePage(pageNo) {
+            $('.active').removeClass('active');
+            $(`#${pageNo}page`).addClass('active');
+        }
+
+
+        ///////////////////////////////////////
+        function Order(self) {
+            order = self.value;
+            GetCategories();
+        }
+
+        ////////////////////////////////////////
+        function Search() {
+            searchString = $('#search').val();
+            GetCategories();
+        }
+
+
+        //////////////////////////////////////////
+        function RemoveFilters() {
+            order = 'featured';
+            $('#order').val('featured');
+            searchString = '';
+            $('#search').val('');
+            GetCategories();
+        }
+        /////////////////////////////////////////
+        function GetCategories(pageNo) {
+            if (!pageNo) {
+                pageNo = 1;
+            }
+            $.ajax({
+                url: `/Admin/Categories/AjaxPage?pageno=${pageNo}&order=${order}&search=${searchString}`,
+                type: "POST",
+                cache: false,
+                success: function (res) {
+                    $("#categoriesTable").replaceWith(res);
+                    ChangeActivePage(pageNo);
+                    $('#15 button').remove();
+                    $(`#message`).css('display', 'none');
+                },
+                error: function () {
+                    console.log('error')
+                }
+            });
+        }
+    </script>
+}

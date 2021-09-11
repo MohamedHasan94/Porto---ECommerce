@@ -1,0 +1,122 @@
+﻿@model PaginatedList<Transaction>
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+
+<h2>My Orders</h2>
+<br />
+
+<div class="alert alert-info" style="display:none" id="message">
+    No Orders found.
+</div>
+
+<!-- filters -->
+<section id="filters" class="row">
+    <!-- Order -->
+    <div class="form-group col-lg-4">
+        <span style="font-size:medium">Sort By:</span>
+        <select class="form-control" style="width:auto;display:inline-block" name="" id="order" onchange="Order(this)">
+            <option value="Status">Status</option>
+            <option value="TimeDsc">Time Dscending</option>
+            <option value="TimeAsc">Time Ascending</option>
+            <option value="PriceAsc">Price Ascending</option>
+            <option value="PriceDsc">Price Dscending</option>
+        </select>
+    </div>
+
+    <!-- search box -->
+    <div class="form-group col-lg-push-4 col-lg-3">
+        <input class="form-control" style="width:auto;display:inline-block" placeholder="Search by product" type="text" name="txt_search" id="search">
+        <button class="btn btn-info" onclick="Search()">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+    <div class="form-group col-lg-push-4 col-lg-2">
+        <button class="btn btn-default" onclick="RemoveFilters()"><img height="20" src="~/images/Filter-Delete-32.png" /></button>
+    </div>
+</section>
+<partial name="_TransactionPartial" model="@Model" />
+@if (Model.Count == 0)
+{
+    <script>
+        document.getElementById('message').style.display = 'block';
+        document.getElementById('transactionsTable').style.display = 'none';
+        document.getElementById('filters').style.display = 'none';
+    </script>
+}
+
+@section Scripts
+{
+    <script>
+        var order = 'Status', searchString = '';
+
+        //////////////////////////////////////
+        function Previouspage() {
+            let previous = parseInt($('.active').attr('id')) - 1;
+            if (previous) {
+                $(`#${previous}`).click();
+            }
+        }
+
+        //////////////////////////////////////
+        function Nextpage() {
+            let next = parseInt($('.active').attr('id')) + 1;
+            if (!(next > @Model.TotalPages)) {
+                $(`#${next}`).click();
+            }
+        }
+
+        ////////////////////////////////////////
+        function Page(no) {
+            newIndex = no;
+            GetTransactions(no);
+        }
+
+        ////////////////////////////////////////
+        function ChangeActivePage(pageNo) {
+            $('.active').removeClass('active');
+            $(`#${pageNo}`).addClass('active');
+        }
+        
+        ///////////////////////////////////////
+        function Order(self) {
+            order = self.value;
+            GetTransactions();
+        }
+
+        ////////////////////////////////////////
+        function Search() {
+            searchString = $('#search').val();
+            GetTransactions();
+        }
+        
+        //////////////////////////////////////////
+        function RemoveFilters() {
+            order = 'Status';
+            $('#order').val('Status');
+            searchString = '';
+            $('#search').val('');
+            GetTransactions();
+        }
+
+        /////////////////////////////////////////
+        function GetTransactions(pageNo) {
+            if (!pageNo) {
+                pageNo = 1;
+            }
+            $.ajax({
+                url: `/Admin/Transactions/AjaxPage?pageNumber=${pageNo}&order=${order}&searchString=${searchString}`,
+                type: "POST",
+                cache: false,
+                success: function (res) {
+                    $("#transactionsTable").replaceWith(res);
+                    ChangeActivePage(pageNo);
+                },
+                error: function () {
+                    console.log('error')
+                }
+            });
+        }
+    </script>
+}

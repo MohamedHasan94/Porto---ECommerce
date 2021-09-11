@@ -1,0 +1,9 @@
+﻿@model Category
+
+<tr id="@Model.Id">
+    @*<td>@Model.Id</td>*@
+    <td>@Model.Name</td>
+    <td>@Model.Products.Count</td>
+    <td><button class="btn btn btn-warning btn-sm" onclick="editCategory(@Model.Id , `@Model.Name`)" data-toggle="modal" data-target="#categoryModal"><i class="far fa-edit"></i></button></td>
+    <td><button onclick="ConfirmDelete(@Model.Id)" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button></td>
+</tr>

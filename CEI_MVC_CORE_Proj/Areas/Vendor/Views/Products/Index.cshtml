@@ -1,0 +1,182 @@
+﻿@model ProductViewModel
+@{
+    ViewData["Title"] = "My Products";
+}
+
+<div style="margin-top:3rem">
+    <a asp-action="Add" class="btn btn-primary">Add new Product</a>
+
+    <br />
+    <br />
+    @{
+        string display = "";
+        if (TempData["Message"] == null)
+        {
+            display = "display:none";
+        }
+    }
+
+    <div class="alert alert-info" style="@display" id="message">
+        @TempData["Message"]
+    </div>
+
+
+    <h2>Your Products</h2>
+    <br />
+    <!-- filters -->
+    <section class="row">
+
+        <!-- Order -->
+        <div class="form-group col-lg-4  col-md-4">
+            <span style="font-size:medium">Sort By:</span>
+            <select class="form-control" style="width:auto;display:inline-block" name="" id="order" onchange="Order(this)">
+                <option value="featured">Featured</option>
+                <option value="priceAsc">Price low to high</option>
+                <option value="priceDsc">Price high to low</option>
+                <option value="nameDsc">Name Descending</option>
+            </select>
+        </div>
+
+        <!-- Category filter -->
+        <div class="form-group col-lg-4 col-md-4">
+            <select class="form-control" style="width:auto" onchange="CategoryFilter(this)"
+                    asp-items="@new SelectList(Model.Categories,nameof(Category.Id),nameof(Category.Name))" id="category">
+                <option value="0">Filter by categories</option>
+            </select>
+        </div>
+        <!-- search box -->
+        <div class="form-group col-lg-push-1 col-lg-2 col-md-3">
+            <input class="form-control" style="width:auto;display:inline-block;max-width:70%;" placeholder="Search..." type="text" name="txt_search" id="search">
+            <button class="btn btn-info" onclick="Search()">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+
+        <!-- Clear filters -->
+        <div class="form-group col-lg-push-1 col-lg-2 col-md-1">
+            <button class="btn btn-default" onclick="RemoveFilters()"><img height="20" src="~/images/Filter-Delete-32.png" /></button>
+        </div>
+    </section>
+    @{
+        if (Model.Products.Count == 0)
+        {
+            <div class="alert alert-info">No Products found , please add</div>
+        }
+        else
+        {
+            <partial name="_ProductRowPartial" model="Model.Products" />
+        }
+    }
+</div>
+@section Scripts
+{
+    <script>
+        function ConfirmDelete(id) {
+            if (confirm("Are you sure to delete this product?")) {
+                $.ajax({
+                    url: `/Vendor/Products/Delete/${id}`,
+                    type: "POST",
+                    cache: false,
+                    success: function (res) {
+                        if (res) {
+                            $(`#${id}`).remove();
+                            $(`#message`).css('display' , 'block');
+                            $(`#message`).text('product deleted successfully');
+                        }
+                        else
+                            $(`#message`).text('Proccess failed, please try again');
+                    },
+                    error: function () {
+                        $(`#message`).text('Proccess failed, please try again');
+                    }
+                });
+            }
+        }
+
+        ///////////////////////////////////////////
+        var categoryId = '', order = 'featured', searchString = '';
+
+        //////////////////////////////////////
+        function Previouspage() {
+            let previous = parseInt($('.active').attr('id')) - 1;
+            if (previous) {
+                $(`#${previous}`).click();
+            }
+        }
+
+        //////////////////////////////////////
+        function Nextpage() {
+            let next = parseInt($('.active').attr('id')) + 1;
+            if (!(next > @Model.Products.TotalPages)) {
+                $(`#${next}`).click();
+            }
+        }
+
+        ////////////////////////////////////////
+        function Page(no) {
+            newIndex = no;
+            GetProducts(no);
+        }
+
+        ////////////////////////////////////////
+        function ChangeActivePage(pageNo) {
+            $('.active').removeClass('active');
+            $(`#${pageNo}`).addClass('active');
+        }
+        
+        ///////////////////////////////////////////
+        function CategoryFilter(current) {
+            let id = Number(current.value);
+            if (id) {
+                categoryId = id;
+            }
+            else {
+                categoryId = '';
+            }
+                GetProducts();
+        }
+                
+        ///////////////////////////////////////
+        function Order(self) {
+            order = self.value;
+            GetProducts();
+        }
+
+        ////////////////////////////////////////
+        function Search() {
+            searchString = $('#search').val();
+            GetProducts();
+        }
+        
+        //////////////////////////////////////////
+        function RemoveFilters() {
+            $('#category').val('0');
+            categoryId = '';
+            order = 'featured';
+            $('#order').val('featured');
+            searchString = '';
+            $('#search').val('');
+            GetProducts();
+        }
+
+        /////////////////////////////////////////
+        function GetProducts(pageNo) {
+            if (!pageNo) {
+                pageNo = 1;
+            }                        
+            $.ajax({
+                url: `/Vendor/Products/AjaxPage?pageno=${pageNo}&order=${order}&categoryId=${categoryId}&search=${searchString}`,
+                type: "POST",
+                cache: false,
+                success: function (res) {
+                    $('#message').css('display', 'none');
+                    $("#productPart").replaceWith(res);
+                    ChangeActivePage(pageNo);
+                },
+                error: function () {
+                    console.log('error')
+                }
+            });
+        }
+    </script>
+}

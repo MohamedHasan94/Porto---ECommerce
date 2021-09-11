@@ -1,0 +1,186 @@
+﻿@model PaginatedList<RequestToAdmin>
+
+
+<div id="contentWrapper">
+
+    @* Add This Section For Filtering *@
+
+    <form asp-action="AjaxPage" onsubmit="FilterPage(this)" method="get">
+        <div class="form-actions no-color">
+            <p>
+                <label>Show only </label>
+                <select name="SearchString" id="myList">
+                    <optgroup label="--Status--">
+                        <option value="Pending">Pending</option>
+                        <option value="Accepted">Accepted</option>
+                        <option value="Rejected">Rejected</option>
+                    </optgroup>
+                    <optgroup label="---Type---">
+                        <option value="Vendor">Vendor</option>
+                        <option value="Category">Category</option>
+                    </optgroup>
+                </select>
+                @*<input id="filter" hidden type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />*@
+                <input type="submit" value="Filter" class="btn btn-default" /> |
+                <a asp-action="Index" class="btn btn-primary">Back to Full List</a>
+            </p>
+        </div>
+    </form>
+    @* ----------------- *@
+
+    <div id="msg" class="alert alert-info" style="display:none;"></div>
+    @if (@Model.Count != 0)
+    {
+        <table id="" class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+
+                    <th>
+                        @Html.DisplayNameFor(m => m.FirstOrDefault().Id)
+                    </th>
+                    <th colspan="" align="center" style="text-align:center;">
+                        @Html.DisplayNameFor(m => m.FirstOrDefault().User.UserName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.FirstOrDefault().Type)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.FirstOrDefault().Data)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.FirstOrDefault().Status)
+                    </th>
+                    <th>
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr id="item-@item.Id" class="@item.Status">
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.User.UserName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Type)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Data)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+
+
+                        <td>
+
+                            @if (item.Status == RequestStatus.Pending)
+                            {
+
+                                <button data-action="AcceptRequest" data-id="@item.Id" onclick="initAction(this)" class="btn btn-info"> Approve </button>
+                                <button data-action="DeclineRequest" data-id="@item.Id" onclick="initAction(this)" class="btn btn-info"> Reject </button>
+                            }
+                            @*<a onclick="deleteUser('@item.Id', '@item.user');" class="btn btn-danger"> Delete User </a>*@
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+        @* Pagination Section **@
+
+
+        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+
+
+        <button onclick="NextPage(this)"
+                data-sortOrder="@ViewData["CurrentSort"]"
+                data-pageNumber="@(Model.PageIndex - 1)"
+                data-currentFilter="@ViewData["CurrentFilter"]"
+                class="btn btn-default @prevDisabled" @prevDisabled>
+            Previous
+        </button>
+
+        <span> @Model.PageIndex </span> <span> / </span> <span> @Model.TotalPages </span>
+
+
+        <button onclick="NextPage(this)"
+                data-sortOrder="@ViewData["CurrentSort"]"
+                data-pageNumber="@(Model.PageIndex + 1)"
+                data-currentFilter="@ViewData["CurrentFilter"]"
+                class="btn btn-default @nextDisabled" @nextDisabled>
+            Next
+        </button>
+
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No Results Found
+        </div>
+
+    }
+
+
+    @* ----------------- **@
+
+
+    <script type="text/javascript">
+        //set previous filter
+    var list = document.getElementById('myList');
+    list.value ='@ViewData["CurrentFilter"]' +"";
+
+
+        function NextPage(btnClicked) {
+
+            $.ajax({
+                url: `/Admin/Requests/AjaxPage`,
+                type: "POST",
+                cache: false,
+                data: btnClicked.dataset,
+                success: function (res) {
+                    console.log(res);
+                    $("#contentWrapper").replaceWith(res);
+                }
+            });
+        }
+        function FilterPage(form) {
+            console.log($(form).serialize())
+            $.ajax({
+                url: `/Admin/Requests/AjaxPage?${$(form).serialize()}`,
+                type: "POST",
+                cache: false,
+                success: function (res) {
+                    console.log(res);
+                    $("#contentWrapper").replaceWith(res);
+                }
+            });
+            event.preventDefault();
+            return false;
+
+        }
+        function initAction(ele) {
+            $.ajax({
+                url: `/Admin/Requests/${ele.dataset.action}?id=${ele.dataset.id}`,
+                type: "POST",
+                cache: false,
+                success: function (res) {
+                    console.log(ele);
+                    ele.parentElement.parentElement.className += " " +res;
+                    ele.parentElement.parentElement.children[4].innerHTML = res;
+                    ele.parentElement.innerHTML = "";
+                    //$("#contentWrapper").replaceWith(res);
+                }
+            })
+        }
+    </script>
+</div>
+
